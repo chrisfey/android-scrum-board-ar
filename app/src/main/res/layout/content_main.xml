@@ -12,4 +12,12 @@
     tools:context="com.zuhlke.tg_mobile.jira_ar_tgmobile.MainActivity"
     tools:showIn="@layout/activity_main">
 
+
+    <TextureView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textureView"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="154dp" />
 </RelativeLayout>

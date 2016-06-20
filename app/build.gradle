@@ -4,10 +4,9 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "com.zuhlke.tg_mobile.jira_ar_tgmobile"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -20,6 +19,8 @@ android {
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+    productFlavors {
     }
 }
 
