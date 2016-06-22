@@ -23,6 +23,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import java.util.*
+import android.util.Base64
+import java.net.*
 
 /**
  * A login screen that offers login via email/password.
@@ -36,6 +38,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     // UI references.
     private var mEmailView: AutoCompleteTextView? = null
     private var mPasswordView: EditText? = null
+    private var mHostAddressView: EditText? = null
     private var mProgressView: View? = null
     private var mLoginFormView: View? = null
 
@@ -43,6 +46,9 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         // Set up the login form.
+        mHostAddressView = findViewById(R.id.hostAddress) as EditText
+        mHostAddressView!!.setText("https://tgmobile.atlassian.net/")
+
         mEmailView = findViewById(R.id.email) as AutoCompleteTextView
 
         mPasswordView = findViewById(R.id.password) as EditText
@@ -93,6 +99,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         mPasswordView!!.error = null
 
         // Store values at the time of the login attempt.
+        val hostAddress = mHostAddressView!!.text.toString()
         val email = mEmailView!!.text.toString()
         val password = mPasswordView!!.text.toString()
 
@@ -106,6 +113,11 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             cancel = true
         }
 
+        if (TextUtils.isEmpty(hostAddress)) {
+            mHostAddressView!!.error = getString(R.string.error_field_required)
+            focusView = mHostAddressView
+            cancel = true
+        }
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView!!.error = getString(R.string.error_field_required)
@@ -125,7 +137,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            mAuthTask = UserLoginTask(email, password)
+            mAuthTask = UserLoginTask(email, password, hostAddress)
             Log.d("about to execute", "about to execute")
             mAuthTask!!.execute()
 
@@ -227,18 +239,18 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
+    inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String, private val mHostAddress: String) : AsyncTask<Void, Void, Boolean>() {
 
         override fun doInBackground(vararg params: Void): Boolean? {
             // TODO: attempt authentication against a network service.
 
-            try {
+           try {
                 // Simulate network access.
                 Thread.sleep(2000)
             } catch (e: InterruptedException) {
                 return false
             }
-
+            //Debug mode
             for (credential in DUMMY_CREDENTIALS) {
                 val pieces = credential.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 if (pieces[0] == mEmail) {
@@ -249,11 +261,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                 }
             }
 
+            return jiraLogin(mEmail, mPassword, mHostAddress)
 
-            Log.d("in background", "in background")
-            // TODO: register the new account here.
-//            return true
-            return false
         }
 
         override fun onPostExecute(success: Boolean?) {
@@ -273,6 +282,20 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         override fun onCancelled() {
             mAuthTask = null
             showProgress(false)
+        }
+
+
+        private fun jiraLogin(email: String, password: String, hostAddress: String): Boolean? {
+            val authentication = email + ":" + password
+            val basic = Base64.encodeToString((authentication).toByteArray(), Base64.DEFAULT)
+
+            val url = URL(hostAddress + "rest/auth/1/session")
+            val client = url.openConnection() as HttpURLConnection
+            client.setRequestProperty("Authorization", "Basic " + basic)
+
+            val authorized = client.responseCode == HttpURLConnection.HTTP_OK
+            client.disconnect();
+            return authorized
         }
     }
 
