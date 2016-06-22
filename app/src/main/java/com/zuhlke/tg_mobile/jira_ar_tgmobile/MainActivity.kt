@@ -1,9 +1,8 @@
 package com.zuhlke.tg_mobile.jira_ar_tgmobile
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.content.Intent
 import android.graphics.ImageFormat
-import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
 import android.media.ImageReader
@@ -15,12 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Surface
-import android.view.SurfaceView
-import android.view.TextureView
 import android.widget.ImageView
-import org.opencv.android.Utils
-import org.opencv.core.Mat
-import java.nio.ByteBuffer
 import java.util.*
 
 class MainActivity : AppCompatActivity()  {
@@ -61,6 +55,10 @@ class MainActivity : AppCompatActivity()  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+//        startActivity(Intent(applicationContext, LoginActivity::class.java))
+
+
         setContentView(R.layout.activity_main)
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
@@ -73,10 +71,10 @@ class MainActivity : AppCompatActivity()  {
 
         val manager =  getSystemService(Context.CAMERA_SERVICE) as CameraManager;
         val cameraIds = manager.cameraIdList
-        val camCharacteristics = manager.getCameraCharacteristics(cameraIds.get(0))
-        manager.openCamera(cameraIds.get(0), stateCallbackHandler(), backgroundHandler)
-
-
+//        val camCharacteristics = manager.getCameraCharacteristics(cameraIds.get(0))
+        if (cameraIds.size > 0) {
+            manager.openCamera(cameraIds.get(0), stateCallbackHandler(), backgroundHandler)
+        }
     }
 
     private fun captureSession(): CameraCaptureSession.StateCallback? {
