@@ -63,7 +63,12 @@ class MainActivity : AppCompatActivity()  {
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
         val fab = findViewById(R.id.fab) as FloatingActionButton
-        fab.setOnClickListener { view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show() }
+        fab.setOnClickListener {
+            view ->
+            val i = Intent(applicationContext, JiraListActivity::class.java)
+            startActivity(i);
+        }
+        //fab.setOnClickListener { view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show() }
 
         imageReader = ImageReader.newInstance(1024,800,  ImageFormat.JPEG, 2)
         //mTextureView =  findViewById(R.id.textureView) as TextureView
