@@ -17,6 +17,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ndk {
                 abiFilters "armeabi-v7a"
+                //CHANGE TO x86 here and  BELOW TO RUN ON EMULATOR, OR COMMENT OUT
             }
         }
 
