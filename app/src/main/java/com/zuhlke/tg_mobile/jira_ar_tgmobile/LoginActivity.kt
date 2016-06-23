@@ -242,12 +242,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         override fun doInBackground(vararg params: Void): Boolean? {
             // TODO: attempt authentication against a network service.
 
-           try {
-                // Simulate network access.
-                Thread.sleep(2000)
-            } catch (e: InterruptedException) {
-                return false
-            }
+
             //Debug mode
             for (credential in DUMMY_CREDENTIALS) {
                 val pieces = credential.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
