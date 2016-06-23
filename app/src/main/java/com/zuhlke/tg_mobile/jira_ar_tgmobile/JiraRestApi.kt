@@ -1,6 +1,7 @@
 package com.zuhlke.tg_mobile.jira_ar_tgmobile
 
 import android.util.Base64
+import android.util.Log
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.HttpURLConnection
