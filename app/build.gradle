@@ -36,6 +36,8 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile project(':libraries:opencv')
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 }
 repositories {
     mavenCentral()

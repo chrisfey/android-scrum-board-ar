@@ -23,8 +23,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import java.util.*
-import android.util.Base64
-import java.net.*
 
 /**
  * A login screen that offers login via email/password.
@@ -284,17 +282,9 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
         }
 
-
         private fun jiraLogin(email: String, password: String, hostAddress: String): Boolean? {
-            val authentication = email + ":" + password
-            val basic = Base64.encodeToString((authentication).toByteArray(), Base64.DEFAULT)
-
-            val url = URL(hostAddress + "rest/auth/1/session")
-            val client = url.openConnection() as HttpURLConnection
-            client.setRequestProperty("Authorization", "Basic " + basic)
-
-            val authorized = client.responseCode == HttpURLConnection.HTTP_OK
-            client.disconnect();
+            val jiraRest = JiraRestApi(hostAddress)
+            val authorized = jiraRest.login(email, password)
             return authorized
         }
     }
