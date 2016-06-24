@@ -1,6 +1,7 @@
 package com.zuhlke.tg_mobile.jira_ar_tgmobile
 
 import android.content.Context
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.Snackbar
@@ -19,7 +20,6 @@ import java.io.*
 import java.util.*
 
 class JiraListActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_view)
@@ -30,6 +30,7 @@ class JiraListActivity : AppCompatActivity() {
             adapterView, view, i, l ->
             Snackbar.make(view, "You clicked ListItem: " + i + ", id: " + l, Snackbar.LENGTH_LONG).setAction("Action", null).show()
         }
+
     }
 
 
@@ -183,5 +184,4 @@ class JiraListActivity : AppCompatActivity() {
         }
 
     }
-
 }

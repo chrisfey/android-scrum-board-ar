@@ -12,4 +12,7 @@ interface  JiraApiInterface {
 
     @GET("/rest/auth/1/session")
     fun getCurrentUser(@Header("Authorization") authorization: String) : Call<JiraSessionResponse>;
+
+    @GET("/rest/api/2/project")
+    fun getProjects(@Header("Authorization") authorization: String) : Call<List<JiraProjectResponse>>;
 }
