@@ -260,7 +260,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
 
             if (success!!) {
-                Log.d("in here", "in here")
                 val i = Intent(applicationContext, MainActivity::class.java)
                 finish()
                 startActivity(i);

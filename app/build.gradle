@@ -15,10 +15,23 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            ndk {
+                abiFilters "armeabi-v7a"
+                //CHANGE TO x86 here and  BELOW TO RUN ON EMULATOR, OR COMMENT OUT
+            }
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable true
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
         }
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        main.jniLibs.srcDirs += 'vuforia/build/lib/armeabi-v7a/libVuforia.so'
     }
     productFlavors {
     }
@@ -38,6 +51,7 @@ dependencies {
     compile project(':libraries:opencv')
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile files('../vuforia/build/java/vuforia/Vuforia.jar')
 }
 repositories {
     mavenCentral()

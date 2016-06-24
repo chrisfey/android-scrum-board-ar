@@ -38,11 +38,13 @@ class MainActivity : AppCompatActivity()  {
                 lock = true;
                 val iv = findViewById(R.id.imageView) as ImageView;
                 Log.d("Image Avaialble", "asdfasdf")
-                val bm = ImageProcessing.process(image)
-                iv.setImageBitmap(bm)
+                if (image != null) {
+                    val bm = ImageProcessing.process(image)
+                    iv.setImageBitmap(bm)
+                }
                 lock = false;
             }
-            image.close()
+            image?.close()
 
         }
 
@@ -68,15 +70,26 @@ class MainActivity : AppCompatActivity()  {
             val i = Intent(applicationContext, JiraListActivity::class.java)
             startActivity(i);
         }
-        //fab.setOnClickListener { view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show() }
+        val fab2 = findViewById(R.id.fab2) as FloatingActionButton
+        fab2.setOnClickListener {
+            view ->
+            val i = Intent(applicationContext, VuforiaTargets::class.java)
+            startActivity(i);
+        }
+        val fab3 = findViewById(R.id.fab3) as FloatingActionButton
+        fab3.setOnClickListener {
+            view -> startCamera()
+        }
+    }
 
-        imageReader = ImageReader.newInstance(1024,800,  ImageFormat.JPEG, 2)
+    private fun startCamera() {
+        imageReader = ImageReader.newInstance(1024, 800, ImageFormat.JPEG, 2)
         //mTextureView =  findViewById(R.id.textureView) as TextureView
         //mTextureView!!.surfaceTextureListener = this
 
-        val manager =  getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+        val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
         val cameraIds = manager.cameraIdList
-//        val camCharacteristics = manager.getCameraCharacteristics(cameraIds.get(0))
+        //        val camCharacteristics = manager.getCameraCharacteristics(cameraIds.get(0))
         if (cameraIds.size > 0) {
             manager.openCamera(cameraIds.get(0), stateCallbackHandler(), backgroundHandler)
         }
