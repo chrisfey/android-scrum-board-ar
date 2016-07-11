@@ -24,11 +24,11 @@ public class UtilTest {
 
     @Test
     public void json_deserialize() {
-        String someJson= "{\"some\":\"json\",\"more\":234}";
+        String someJson= "{\"some\":{\"aaa\":5},\"more\":234}";
 
         try {
             Map<String, Object> json = new ObjectMapper().readValue(someJson, Map.class);
-            assertEquals("json", json.get("some"));
+            assertEquals(5, ((Map)json.get("some")).get("aaa"));
             assertEquals(234, json.get("more"));
         }catch(Exception e){
             throw new RuntimeException(e);

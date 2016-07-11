@@ -57,7 +57,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             }
             false
         })
-
+        mEmailView!!.setText("foo@example.com");
+        mPasswordView!!.setText("hello") ;
         val mEmailSignInButton = findViewById(R.id.email_sign_in_button) as Button
         mEmailSignInButton.setOnClickListener { attemptLogin() }
 

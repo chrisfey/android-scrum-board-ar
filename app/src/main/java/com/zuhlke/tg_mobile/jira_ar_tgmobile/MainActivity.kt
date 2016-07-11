@@ -2,6 +2,7 @@ package com.zuhlke.tg_mobile.jira_ar_tgmobile
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
@@ -9,55 +10,54 @@ import android.media.ImageReader
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Surface
 import android.widget.ImageView
+import org.opencv.android.OpenCVLoader
+import org.opencv.android.Utils
+import org.opencv.imgcodecs.Imgcodecs
 import java.util.*
 
 class MainActivity : AppCompatActivity()  {
-
-
+    var lock = false;
+    var imageReader : ImageReader? = null
+    var cameraOpened : CameraDevice? = null
+    private var knn: KNN? = null;
+    val backgroundHandler = Handler()
 
     val mCaptureCallback = object : CaptureCallback() {
-
         override fun onCaptureCompleted(session: CameraCaptureSession?, request: CaptureRequest?, result: TotalCaptureResult?) {
             super.onCaptureCompleted(session, request, result)
 
         }
-
     }
 
-    var lock = false;
     val onImageAvailableListener = object : ImageReader.OnImageAvailableListener{
         override fun onImageAvailable(reader: ImageReader?) {
             val image = reader!!.acquireLatestImage()
-            if(!lock) {
-                lock = true;
-                val iv = findViewById(R.id.imageView) as ImageView;
-                Log.d("Image Avaialble", "asdfasdf")
-                if (image != null) {
-                    val bm = ImageProcessing.process(image)
+
+            if (OpenCVLoader.initDebug()) {
+                if(!lock) {
+                    lock = true;
+                    val iv = findViewById(R.id.cameraImageView) as ImageView;
+                    Log.d("Image Avaialble", "asdfasdf")
+                    val bm = ImageProcessing.process(image, knn)
                     iv.setImageBitmap(bm)
+                    lock = false;
                 }
-                lock = false;
+            } else {
+                image.close()
+                throw RuntimeException("couldnt load opencv")
             }
-            image?.close()
+            image.close()
 
         }
 
     }
-    var imageReader : ImageReader? = null
-    var cameraOpened : CameraDevice? = null
-    //var mSurface : Surface? = null
-    //var mTextureView : TextureView? = null
-    val backgroundHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 //        startActivity(Intent(applicationContext, LoginActivity::class.java))
 
 
@@ -88,17 +88,24 @@ class MainActivity : AppCompatActivity()  {
         //mTextureView!!.surfaceTextureListener = this
 
         val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+        setContentView(R.layout.activity_camera)
+        imageReader = ImageReader.newInstance(1024,800,  ImageFormat.JPEG, 2)
+        val manager =  getSystemService(Context.CAMERA_SERVICE) as CameraManager;
         val cameraIds = manager.cameraIdList
         //        val camCharacteristics = manager.getCameraCharacteristics(cameraIds.get(0))
         if (cameraIds.size > 0) {
             manager.openCamera(cameraIds.get(0), stateCallbackHandler(), backgroundHandler)
+        }
+        if (OpenCVLoader.initDebug()) {
+            val trainingData = Utils.loadResource(applicationContext, R.drawable.training, Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE)
+            knn = KNN(trainingData)
         }
     }
 
     private fun captureSession(): CameraCaptureSession.StateCallback? {
         return object : CameraCaptureSession.StateCallback() {
             override fun onConfigureFailed(session: CameraCaptureSession?) {
-                throw UnsupportedOperationException()
+                throw RuntimeException("Need To implement this later")
             }
 
             override fun onConfigured(session: CameraCaptureSession?) {
@@ -118,11 +125,11 @@ class MainActivity : AppCompatActivity()  {
         }
     }
 
-    private fun stateCallbackHandler(): CameraDevice.StateCallback? {
+    private fun stateCallbackHandler(): CameraDevice.StateCallback {
 
         return  object : CameraDevice.StateCallback(){
             override fun onError(camera: CameraDevice?, error: Int) {
-                throw UnsupportedOperationException()
+                throw RuntimeException("Need To implement this later")
             }
 
             override fun onOpened(camera: CameraDevice?){
@@ -138,44 +145,11 @@ class MainActivity : AppCompatActivity()  {
 
 
             override fun onDisconnected(camera: CameraDevice?) {
-                throw UnsupportedOperationException()
+                Log.d("LATER","Need To implement this later")
             }
 
         }
     }
-
-//    override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
-//
-//        //throw UnsupportedOperationException()
-//    }
-//
-//    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-//        //throw UnsupportedOperationException()
-//    }
-//
-//    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
-//        throw UnsupportedOperationException()
-//    }
-
-//    override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-//
-//
-//
-//        val manager =  getSystemService(Context.CAMERA_SERVICE) as CameraManager;
-//        val cameraIds = manager.cameraIdList
-//        val camCharacteristics = manager.getCameraCharacteristics(cameraIds.get(0))
-//
-//        //val texture = mTextureView!!.surfaceTexture
-//
-//        mSurface = Surface(texture);
-//
-//
-//
-//
-//
-//        manager.openCamera(cameraIds.get(0), stateCallbackHandler(), backgroundHandler)
-//
-//    }
 
 
 }

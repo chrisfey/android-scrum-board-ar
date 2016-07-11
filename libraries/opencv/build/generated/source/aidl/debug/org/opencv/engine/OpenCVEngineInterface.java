@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /Users/chfe/AndroidStudioProjects/jira-ar-tgmobile/libraries/opencv/src/org/opencv/engine/OpenCVEngineInterface.aidl
+ * Original file: /Users/chfe/AndroidStudioProjects/jiraarandroid/libraries/opencv/src/org/opencv/engine/OpenCVEngineInterface.aidl
  */
 package org.opencv.engine;
 /**
