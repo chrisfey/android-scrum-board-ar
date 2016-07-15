@@ -138,7 +138,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             mAuthTask = UserLoginTask(email, password, hostAddress)
             Log.d("about to execute", "about to execute")
             mAuthTask!!.execute()
-
         }
     }
 
@@ -242,7 +241,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         override fun doInBackground(vararg params: Void): Boolean? {
             // TODO: attempt authentication against a network service.
 
-
             //Debug mode
             for (credential in DUMMY_CREDENTIALS) {
                 val pieces = credential.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -255,7 +253,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             }
 
             return jiraLogin(mEmail, mPassword, mHostAddress)
-
         }
 
         override fun onPostExecute(success: Boolean?) {
@@ -264,6 +261,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
             if (success!!) {
                 val i = Intent(applicationContext, MainActivity::class.java)
+                finish()
                 startActivity(i);
             } else {
                 mPasswordView!!.error = getString(R.string.error_incorrect_password)
@@ -277,8 +275,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
 
         private fun jiraLogin(email: String, password: String, hostAddress: String): Boolean? {
-            val jiraRest = JiraRestApi(hostAddress)
-            val authorized = jiraRest.login(email, password)
+            val jiraManager = (application as App).getManager(hostAddress)
+            val authorized = jiraManager.login(email, password)
             return authorized
         }
     }
