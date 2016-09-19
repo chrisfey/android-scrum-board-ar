@@ -30,9 +30,6 @@ import static org.opencv.imgproc.Imgproc.boundingRect;
 import static org.opencv.imgproc.Imgproc.contourArea;
 import static org.opencv.imgproc.Imgproc.isContourConvex;
 
-/**
- * Created by chfe on 21/06/16.
- */
 public class ImageProcessing {
 
 
@@ -83,10 +80,10 @@ public class ImageProcessing {
                 Mat resized = new Mat();
                 Imgproc.resize(digit, resized, new Size(20, 20));
 
-                double a = knn.matchDigits(knn.createTestFeature(resized));
+                double a = knn.matchDigits(KNN.createTestFeature(resized));
 
 
-                found += new Double(a).intValue();
+                found += Double.valueOf(a).intValue();
 
 
                 //Copy the digits to the main image
@@ -141,7 +138,7 @@ public class ImageProcessing {
             Rect digitRect = new Rect(new Point(r.x + r.width / 2, r.y), new Point(r.x + r.width, r.y + r.height / 3));
             Mat bound = originalImage.submat(digitRect);
 
-            ArrayList<Mat> hsvDigit = new ArrayList<Mat>(3);
+            ArrayList<Mat> hsvDigit = new ArrayList<>(3);
             Core.split(bound, hsvDigit);
             Mat brightDigit = hsvDigit.get(2);
             Mat thresh = threshold(brightDigit);
@@ -200,7 +197,7 @@ public class ImageProcessing {
 
     private static ContourResult filterContours(ContourResult result, double minSizeContour){
         // remove small and non convex contours
-        ArrayList<MatOfPoint> filteredPoints = new ArrayList<MatOfPoint>();
+        ArrayList<MatOfPoint> filteredPoints = new ArrayList<>();
         for (int i = 0; i < result.points.size(); i++) {
             MatOfPoint2f approx = new MatOfPoint2f();
             // Approximate contour with accuracy proportional
@@ -219,7 +216,7 @@ public class ImageProcessing {
     }
 
     private static ContourResult removeSmallContours(ContourResult result, double minSizeContour, int parent){
-        ArrayList<MatOfPoint> filteredPoints = new ArrayList<MatOfPoint>();
+        ArrayList<MatOfPoint> filteredPoints = new ArrayList<>();
         for (int i = 0; i < result.points.size(); i++)
         {
             if (Math.abs(contourArea(result.points.get(i))) < minSizeContour ) continue;
@@ -244,7 +241,7 @@ public class ImageProcessing {
         final Mat dst = new Mat(src.rows(), src.cols(), src.type());
         src.copyTo(dst);
 
-        final ArrayList<MatOfPoint> points = new ArrayList<MatOfPoint>();
+        final ArrayList<MatOfPoint> points = new ArrayList<>();
         final Mat hierarchy = new Mat();
         Imgproc.findContours(dst, points, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         return new ContourResult(hierarchy, points, dst.size());
