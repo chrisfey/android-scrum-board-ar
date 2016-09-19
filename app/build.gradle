@@ -51,7 +51,6 @@ dependencies {
     compile project(':libraries:opencv')
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile files('../vuforia/build/java/vuforia/Vuforia.jar')
 }
 repositories {
     mavenCentral()

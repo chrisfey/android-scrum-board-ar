@@ -2,7 +2,6 @@ package com.zuhlke.tg_mobile.jira_ar_tgmobile
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
@@ -62,8 +61,8 @@ class MainActivity : AppCompatActivity()  {
 
 
         setContentView(R.layout.activity_main)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar)
+//        val toolbar = findViewById(R.id.toolbar) as Toolbar
+//        setSupportActionBar(toolbar)
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener {
             view ->
@@ -71,11 +70,12 @@ class MainActivity : AppCompatActivity()  {
             startActivity(i);
         }
         val fab2 = findViewById(R.id.fab2) as FloatingActionButton
-        fab2.setOnClickListener {
-            view ->
-            val i = Intent(applicationContext, VuforiaTargets::class.java)
-            startActivity(i);
-        }
+        //I cant compile with any of the vuforia stuff, need to include the .jar?
+//        fab2.setOnClickListener {
+//            view ->
+//            val i = Intent(applicationContext, VuforiaTargets::class.java)
+//            startActivity(i);
+//        }
         val fab3 = findViewById(R.id.fab3) as FloatingActionButton
         fab3.setOnClickListener {
             view -> startCamera()
@@ -87,7 +87,6 @@ class MainActivity : AppCompatActivity()  {
         //mTextureView =  findViewById(R.id.textureView) as TextureView
         //mTextureView!!.surfaceTextureListener = this
 
-        val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
         setContentView(R.layout.activity_camera)
         imageReader = ImageReader.newInstance(1024,800,  ImageFormat.JPEG, 2)
         val manager =  getSystemService(Context.CAMERA_SERVICE) as CameraManager;
