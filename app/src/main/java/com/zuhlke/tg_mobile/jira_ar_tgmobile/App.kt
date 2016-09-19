@@ -10,6 +10,7 @@ class App: Application() {
     private var jiraManager = JiraApiManager("https://jira.atlassian.com/")
 
     fun getManager(host: String) : JiraApiManager {
+
         jiraManager = JiraApiManager(host)
         return jiraManager
     }
