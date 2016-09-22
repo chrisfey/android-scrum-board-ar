@@ -45,15 +45,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".JiraListActivity"
+            android:name=".jira.JiraListActivity"
             android:label="@string/app_name" >
         </activity>
           <activity
-            android:name=".PostItScannerActivity"
+              android:screenOrientation="landscape"
+              android:name=".postit.PostItScannerActivity"
             android:label="@string/app_name" >
         </activity>
 
-        <activity android:name=".VuforiaTargets"></activity>
     </application>
 
 </manifest>

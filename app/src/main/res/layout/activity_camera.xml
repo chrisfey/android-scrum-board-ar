@@ -8,6 +8,11 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.zuhlke.tg_mobile.jira_ar_tgmobile.MainActivity">
 
+    <ImageView
+        android:id="@+id/backgroundImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY" />
 
     <ImageView
         android:id="@+id/cameraImageView"

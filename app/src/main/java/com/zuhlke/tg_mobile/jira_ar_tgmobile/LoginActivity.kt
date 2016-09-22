@@ -44,7 +44,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         // Set up the login form.
-        mHostAddressView = findViewById(R.id.hostAddress) as EditText
+        mHostAddressView = findViewById(R.id.hostAddress)!! as EditText
         mHostAddressView!!.setText("https://tgmobile.atlassian.net/")
 
         mEmailView = findViewById(R.id.email) as AutoCompleteTextView
@@ -66,17 +66,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         mProgressView = findViewById(R.id.login_progress)
     }
 
-//    /**
-//     * Callback received when a permissions request has been completed.
-//     */
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-//                                            grantResults: IntArray) {
-//        if (requestCode == REQUEST_READ_CONTACTS) {
-//            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                populateAutoComplete()
-//            }
-//        }
-//    }
 
     override fun onBackPressed() {
         //disable going back to main task
