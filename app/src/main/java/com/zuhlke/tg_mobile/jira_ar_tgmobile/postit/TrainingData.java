@@ -10,6 +10,7 @@ import static org.opencv.core.CvType.CV_32FC1;
 
 public class TrainingData {
 
+    private static  int DIGITS_TO_LEARN;
     private int SAMPLES_IN_ROW ;
     private Mat image = new Mat();
     private int CELL_SIZE;
@@ -17,8 +18,9 @@ public class TrainingData {
     private MatOfFloat trainingData = new MatOfFloat();
     private MatOfInt trainLabels = new MatOfInt();
 
-    TrainingData(int numberOfExamplesInEachRow, int cellSize, Mat image){
+    TrainingData(int numberOfExamplesInEachRow, int cellSize, Mat image, int digitsToLearn){
         image.convertTo(this.image, CvType.CV_32FC1);
+        this.DIGITS_TO_LEARN = digitsToLearn;
         this.SAMPLES_IN_ROW = numberOfExamplesInEachRow;
         this.CELL_SIZE = cellSize;
         buildTrainingData();
@@ -27,8 +29,8 @@ public class TrainingData {
 
 
     private void buildTrainingLabels() {
-        int[] aaa = new int[SAMPLES_IN_ROW * 10];
-        for (int number = 0; number <= 10 - 1; number++) {
+        int[] aaa = new int[SAMPLES_IN_ROW * DIGITS_TO_LEARN];
+        for (int number = 0; number <= DIGITS_TO_LEARN - 1; number++) {
             for (int i = 0; i < SAMPLES_IN_ROW; i++) {
                 aaa[number * SAMPLES_IN_ROW + i] = number;
             }
@@ -37,7 +39,7 @@ public class TrainingData {
     }
 
     private MatOfFloat buildTrainingData() {
-        for (int row = 0; row < 10; row++) {
+        for (int row = 0; row < DIGITS_TO_LEARN; row++) {
             addRowOfTrainingData(trainingData, SAMPLES_IN_ROW, row );// *5 because there are 5 rows of training data for each digit
         }
         return trainingData;

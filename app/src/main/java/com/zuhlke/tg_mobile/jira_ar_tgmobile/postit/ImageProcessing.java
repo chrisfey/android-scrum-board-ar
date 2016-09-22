@@ -56,49 +56,58 @@ public class ImageProcessing {
         return bm;
     }
 
-    public static ImageProcessingResult process(Image image, KNN knn){
+    public static ImageProcessingResult process(Image image, KNN knn) {
         Mat imageRgb = imageToMat(image);
         Mat imageHsv = rgbImageToHsv(imageRgb);
         Mat saturation = hsvToSaturation(imageHsv);
         Mat thresh = threshold(saturation);
         ContourResult contours = contours(thresh);
-        //Mat prettyContours = drawContours(contours);
         ContourResult filtered = filterContours(contours, 1000);
         Mat prettyfilteredContours = drawContoursOnTo(filtered, imageRgb);
 
         ArrayList<SortedMap<Integer, Mat>> postItsAndTheirDigits = extractDigits(filtered, imageHsv);
 
-
-        //Mat finalMat = Mat.zeros(100, 20, postItsAndTheirDigits.get(0).get(0).type());
-        //resize digits to 2020
         ArrayList<String> postitsAndDigits = new ArrayList<>();
-        for(SortedMap<Integer, Mat> digits : postItsAndTheirDigits){
-            Log.d(LOGTAG, "digits size"+digits.size());
+        for (SortedMap<Integer, Mat> digits : postItsAndTheirDigits) {
+            Log.d(LOGTAG, "digits size" + digits.size());
             String found = "";
             int i = 0;
-            for(Mat digit: digits.values()){
+            for (Mat digit : digits.values()) {
                 Mat resized = new Mat();
                 Imgproc.resize(digit, resized, new Size(20, 20));
-//                double a = knn.matchDigits(KNN.createTestFeature(resized));
- //               found += Double.valueOf(a).intValue();
+                double a = knn.matchDigits(KNN.createTestFeature(resized));
+                found += Double.valueOf(a).intValue();
                 //Copy the digits to the main image
-               Mat rgbResized = new Mat();
-               // Mat rgbResized = digit;
+                Mat rgbResized = new Mat();
+                // Mat rgbResized = digit;
                 Imgproc.cvtColor(resized, rgbResized, Imgproc.COLOR_GRAY2RGB);
-               // Imgproc.cvtColor(digit, rgbResized, Imgproc.COLOR_GRAY2RGB);
+
                 // Log.d   ("POSTITS", "resized" + resized.size());
                 for (int x = 0; x < rgbResized.size().width; x++) {
                     for (int y = 0; y < rgbResized.size().height; y++) {
-                        prettyfilteredContours.put(y , x + (20 * i), rgbResized.get(y, x));
+                        prettyfilteredContours.put(y, x + (20 * i), rgbResized.get(y, x));
                         //resized.copyTo(prettyfilteredContours);
                     }
                 }
                 //digits.add(i, resized);
                 i++;
             }
-            if(!found.equals("")) {
+
+            if (!found.equals("")) {
+                found = found.replace("00", "0");
                 postitsAndDigits.add(found);
                 Log.d(LOGTAG, "Found digits" + found);
+            }
+        }
+
+        Mat debugRgb = new Mat();
+
+        Imgproc.cvtColor(debug, debugRgb, Imgproc.COLOR_GRAY2RGB);
+        //copy debug to image
+        for (int x = 0; x < debugRgb.size().width; x++) {
+            for (int y = 0; y < debugRgb.size().height; y++) {
+                prettyfilteredContours.put(y + 20, x, debugRgb.get(y, x));
+                //resized.copyTo(prettyfilteredContours);
             }
         }
         //Imgproc.cvtColor(someDig,rgb, Imgproc.COLOR_HSV2RGB );
@@ -107,23 +116,24 @@ public class ImageProcessing {
         Bitmap result = matToBitmap(prettyfilteredContours);
 
 
-        return new ImageProcessingResult(result , postitsAndDigits);
+        return new ImageProcessingResult(result, postitsAndDigits);
     }
 
-    static class ImageProcessingResult{
+    static class ImageProcessingResult {
         Bitmap finalBitmap;
         ArrayList<String> digits;
         ArrayList<PostItItem> postIts;
 
-        ImageProcessingResult(Bitmap finalBitmap, ArrayList<String> digits){
+        ImageProcessingResult(Bitmap finalBitmap, ArrayList<String> digits) {
             this.finalBitmap = finalBitmap;
             this.digits = digits;
         }
 
 
     }
-    static class PostItItem{
-        PostItItem(String digit, Rect postit){
+
+    static class PostItItem {
+        PostItItem(String digit, Rect postit) {
 
         }
     }
@@ -147,12 +157,15 @@ public class ImageProcessing {
         return imageHsv;
     }
 
+
+    private static Mat debug;
+
     private static ArrayList<SortedMap<Integer, Mat>> extractDigits(ContourResult postItNotes, Mat hsvImage) {
 
 
         ArrayList<SortedMap<Integer, Mat>> postIts = new ArrayList<>();
         System.out.println("Number of filtered results: " + postItNotes.points.size());
-        for(int i = 0; i < postItNotes.points.size(); i++) {
+        for (int i = 0; i < postItNotes.points.size(); i++) {
             Rect r = boundingRect(postItNotes.points.get(i));
             double minContourSize = r.area() * 0.0001;
 
@@ -163,19 +176,22 @@ public class ImageProcessing {
             Mat brightDigit = hsvToBrightness(bound);
             Mat thresh = threshold(brightDigit);
 
+            debug = thresh;
             ContourResult contourResult = contours(thresh);
             //Mat contour = drawContours(contourResult);
             //writeToFile(contour, i ,"contourDigit.png");
             int largest = contourResult.removeLargestContour();
-            ContourResult filtered = removeSmallContours(contourResult, minContourSize,largest);
+            ContourResult filtered = removeSmallContours(contourResult, minContourSize, largest);
 
             //filteredContour.copyTo(output);
 
-            int MAX_NUMBER_OF_DIGITS_TO_ALLOW = 4;
-            Log.d(LOGTAG, "filteredpointsSize" +filtered.points);
+            int MAX_NUMBER_OF_DIGITS_TO_ALLOW = 5;
+            int MIN_NUMBER_OF_DIGITS_TO_ALLOW = 3;
+            Log.d(LOGTAG, "filteredpointsSize" + filtered.points);
 
-            if(filtered.points.size() < MAX_NUMBER_OF_DIGITS_TO_ALLOW) {
-                SortedMap<Integer,Mat> digitsForThisPostit = new TreeMap<>();
+            if (filtered.points.size() >= MIN_NUMBER_OF_DIGITS_TO_ALLOW
+                    && filtered.points.size() <= MAX_NUMBER_OF_DIGITS_TO_ALLOW) {
+                SortedMap<Integer, Mat> digitsForThisPostit = new TreeMap<>();
                 for (int j = 0; j < filtered.points.size(); j++) {
                     Rect digitBox = boundingRect(filtered.points.get(j));
                     Mat digit = thresh.submat(digitBox);
@@ -194,9 +210,10 @@ public class ImageProcessing {
     private static Mat drawContours(ContourResult result) {
         return drawContoursOnTo(result, Mat.zeros(result.size, CvType.CV_8UC3));
     }
+
     private static Mat drawContoursOnTo(ContourResult result, Mat background) {
         Random rnd = new Random();
-        System.out.println("found "+result.points.size()+"contours");
+        System.out.println("found " + result.points.size() + "contours");
         System.out.println("fqekfbo;qbqljABNQLNSF'qsfnoqeALVNeip");
         for (int i = 0; i < result.points.size(); i++) {
             Scalar color = new Scalar(rnd.nextInt(255), rnd.nextInt(255), rnd.nextInt(255));
@@ -207,7 +224,7 @@ public class ImageProcessing {
 
 
     private static Mat threshold(Mat src) {
-        return threshold(src,255,255);
+        return threshold(src, 255, 255);
     }
 
     private static Mat threshold(Mat src, int thresh, int maxVal) {
@@ -219,7 +236,7 @@ public class ImageProcessing {
     }
 
 
-    private static ContourResult filterContours(ContourResult result, double minSizeContour){
+    private static ContourResult filterContours(ContourResult result, double minSizeContour) {
         // remove small and non convex contours
         ArrayList<MatOfPoint> filteredPoints = new ArrayList<>();
         for (int i = 0; i < result.points.size(); i++) {
@@ -233,17 +250,16 @@ public class ImageProcessing {
             if (Math.abs(contourArea(result.points.get(i))) < minSizeContour || !isContourConvex(new MatOfPoint(approx.toArray())))
                 continue;
             filteredPoints.add(result.points.get(i));
-            System.out.println("Passed Filtering "+i);
+            System.out.println("Passed Filtering " + i);
 
         }
         return new ContourResult(result, filteredPoints);
     }
 
-    private static ContourResult removeSmallContours(ContourResult result, double minSizeContour, int parent){
+    private static ContourResult removeSmallContours(ContourResult result, double minSizeContour, int parent) {
         ArrayList<MatOfPoint> filteredPoints = new ArrayList<>();
-        for (int i = 0; i < result.points.size(); i++)
-        {
-            if (Math.abs(contourArea(result.points.get(i))) < minSizeContour ) continue;
+        for (int i = 0; i < result.points.size(); i++) {
+            if (Math.abs(contourArea(result.points.get(i))) < minSizeContour) continue;
             //if(result.hierarchy.get(0,i)[3] != parent) continue;
             filteredPoints.add(new MatOfPoint(result.points.get(i).toArray()));
         }
@@ -251,12 +267,11 @@ public class ImageProcessing {
     }
 
 
-
     private static Mat edgeDetect(Mat src) {
         final Mat dst = new Mat(src.rows(), src.cols(), src.type());
         src.copyTo(dst);
         Mat edges = new Mat();
-        Imgproc.Canny(dst, edges, 70,90);
+        Imgproc.Canny(dst, edges, 70, 90);
         return edges;
     }
 
@@ -271,7 +286,8 @@ public class ImageProcessing {
         return new ContourResult(hierarchy, points, dst.size());
 
     }
-    static class ContourResult{
+
+    static class ContourResult {
         public ArrayList<MatOfPoint> points;
         public Mat hierarchy;
         public Size size;
@@ -291,14 +307,14 @@ public class ImageProcessing {
         public int removeLargestContour() {
             double biggestSize = -1;
             int biggestIndex = -1;
-            for(int i =0; i < points.size();i++){
+            for (int i = 0; i < points.size(); i++) {
                 double currentSize = Math.abs(contourArea(points.get(i)));
-                if(currentSize > biggestSize ){
+                if (currentSize > biggestSize) {
                     biggestIndex = i;
                     biggestSize = currentSize;
                 }
             }
-            if(biggestIndex == -1) throw new SkipFrame("No contours detected");
+            if (biggestIndex == -1) throw new SkipFrame("No contours detected");
             points.remove(biggestIndex);
             return biggestIndex;
         }

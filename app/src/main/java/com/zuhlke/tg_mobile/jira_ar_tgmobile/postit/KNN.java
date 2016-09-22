@@ -9,14 +9,14 @@ import static org.opencv.ml.Ml.ROW_SAMPLE;
 
 public class KNN {
 
-    static int NUMBER_OF_DIGITS = 10;
+    static int NUMBER_OF_DIGITS = 4;
     static int SAMPLES_IN_ROW = 10;
     static int K = 3; // Argument to K nearest neighbours
     private final KNearest knn;
 
 
     public KNN(Mat img) {
-        TrainingData trainingData = new TrainingData(SAMPLES_IN_ROW, CELL_SIZE, img);
+        TrainingData trainingData = new TrainingData(SAMPLES_IN_ROW, CELL_SIZE, img, NUMBER_OF_DIGITS);
         knn = KNearest.create();
         knn.train(trainingData.getFeatures(), ROW_SAMPLE, trainingData.getLabels());
     }

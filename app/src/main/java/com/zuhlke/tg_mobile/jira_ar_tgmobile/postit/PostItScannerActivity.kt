@@ -34,6 +34,7 @@ class PostItScannerActivity : ImageReader.OnImageAvailableListener, Callback<Jir
     val cameraUtil: CameraUtil = CameraUtil(this)
 
     var jiraIssues: JiraIssues? = null
+    var jiraItem: JiraItem? = null
 
     override fun onResponse(call: Call<JiraIssues>?, response: Response<JiraIssues>?) {
         Log.d(LOGTAG, "jira response")
@@ -131,42 +132,51 @@ class PostItScannerActivity : ImageReader.OnImageAvailableListener, Callback<Jir
         if (image != null) {
             lock.tryLock({
                 val result = ImageProcessing.process(image, knn)
-                val jiraItem = getMatchingJira(result.digits)
+                setMatchingJira(result.digits)
                 val finalBitmap = result.finalBitmap;
                 drawJiraItemOnBitmap(result.finalBitmap, jiraItem)
                 imageView!!.setImageBitmap(finalBitmap)
 
             }, {})
+
+            image.close()
         }
-        image.close()
+
     }
 
-    private fun drawJiraItemOnBitmap(finalBitmap: Bitmap?, jiraItem: JiraItem?): Bitmap? {
-        val can = Canvas(finalBitmap);
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG);
-        // text color - #3D3D3D
-        paint.setColor(Color.rgb(61, 61, 61));
-        // text size in pixels
-        paint.textSize = 14f;
-        // text shadow
-        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE);
+    private fun drawJiraItemOnBitmap(bitmap: Bitmap?, jiraItem: JiraItem?): Bitmap? {
+        if(jiraItem != null) {
+            val text = "Priority: " + jiraItem.priority + "\n Issue Type: " + jiraItem.issueType
+            val can = Canvas(bitmap);
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG);
+            // text color - #3D3D3D
+            paint.setColor(Color.rgb(61, 61, 255));
+            // text size in pixels
+            paint.textSize = 40f;
+            // text shadow
+            paint.setShadowLayer(1f, 0f, 1f, Color.WHITE);
 
-        // draw text to the Canvas center
-        val bounds = Rect();
-        val text = "Hello" + jiraItem?.priority
-        paint.getTextBounds(text, 0, text.length, bounds);
-        can.drawText(text, 0f, 20f, paint);
-        return finalBitmap
+            // draw text to the Canvas center
+            val bounds = Rect();
+
+            paint.getTextBounds(text, 0, text.length, bounds);
+            val x = (bitmap!!.getWidth() - bounds.width()) / 2f;
+            val y = (bitmap.getHeight() + bounds.height()) / 2f;
+            can.drawText(text, x, y, paint);
+        }
+        return bitmap
     }
 
-    private fun getMatchingJira(postIts: ArrayList<String>): JiraItem? {
+    private fun setMatchingJira(postIts: ArrayList<String>) {
         val jiraIssues = jiraIssues
         if (jiraIssues != null) {
-            return postIts.asSequence()
+            val itemFound = postIts.asSequence()
                     .map { digits -> getMatchingJiraItem(digits, jiraIssues) }
                     .firstOrNull()
+            if(itemFound != null){
+                jiraItem = itemFound
+            }
         }
-        return null
     }
 
     private fun getMatchingJiraItem(digits: String, jiraIssues: JiraIssues): JiraItem? {
